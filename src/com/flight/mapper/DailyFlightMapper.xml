@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="com.flight.mapper.DailyFlightMapper">
+
+	<resultMap type="com.flight.po.Flight" id="FlightAndTicketPrice">
+		<result column ="flight_no" property = "flight_no"/>
+		<result column ="terminal_no" property = "terminal_no"/>
+		<result column ="Ter_terminal_no" property = "Ter_terminal_no"/>
+		<result column ="aircraft_no" property = "aircraft_no"/>
+		<result column ="scheduled_departure_time" property = "scheduled_departure_time"/>
+		<result column ="scheduled_arrival_time" property = "scheduled_arrival_time"/>
+		<result column ="catering" property = "catering"/>
+		<result column ="flight_time" property = "flight_time"/>
+		<result column ="dAirport_name" property = "dAirport_name"/>
+		<result column ="dTerminal_name" property = "dTerminal_name"/>
+		<result column ="aAirport_name" property = "aAirport_name"/>
+		<result column ="aTerminal_name" property = "aTerminal_name"/>
+		<result column ="aircraft_name" property = "aircraft_name"/>
+		<collection property="ticketpriceList" ofType="com.flight.po.TicketPrice">
+			<result column ="ticket_price_no" property = "ticket_price_no"/>
+			<result column ="seat_type_no" property = "seat_type_no"/>
+			<result column ="daily_flight_no" property = "daily_flight_no"/>
+			<result column ="price" property = "price"/>
+			<result column ="ticket_num" property = "ticket_num"/>
+			<result column ="seat_type_name" property = "seat_type_name"/>
+			<result column ="luggage_limit" property = "luggage_limit"/>
+			<result column ="refund_change_rules" property = "refund_change_rules"/>
+		</collection>
+	</resultMap>
+	<select id="findAllDailyFlight" parameterType = "com.flight.po.DailyFlightSelect"
+		resultMap = "FlightAndTicketPrice">
+		select Flight.*,C.airport_name as dAirport_name,A.terminal_name as dTerminal_name,
+		D.airport_name as aAirport_name,B.terminal_name as aTerminal_name,aircraft_name,
+		Ticket_Price.*,seat_type_name,luggage_limit,refund_change_rules
+		from Flight,Terminal as A,Terminal as B,Airport as C,Airport as D,Aircraft,Daily_Flight,Ticket_Price,Seat_Type
+		where Flight.flight_no in (
+			select flight_no from Daily_Flight 
+				where 
+					flight_no in ( 
+						select flight_no from Flight where 
+						terminal_no in (
+							select terminal_no from Terminal where airport_no in (
+								select airport_no from Airport where city_no in (
+									select city_no from city where city_name = #{departure_city}))) 
+						and 
+						Ter_terminal_no in (
+							select terminal_no from Terminal where airport_no in (
+								select airport_no from Airport where city_no in (
+									select city_no from city where city_name = #{arrival_city})))
+					)
+			)
+		and Flight.terminal_no = A.terminal_no and A.airport_no = C.airport_no
+		and Flight.Ter_terminal_no = B.terminal_no and B.airport_no = D.airport_no
+		and Flight.aircraft_no = Aircraft.aircraft_no
+		and Daily_Flight.flight_no = Flight.flight_no
+		and flight_date = #{flight_date}
+		and Daily_Flight.daily_flight_no = Ticket_Price.daily_flight_no
+		and Ticket_Price.seat_type_no = Seat_Type.seat_type_no
+		order by scheduled_departure_time asc, price asc;
+	</select>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="com.flight.mapper.ReportMapper">
+
+	<select id="printReport" parameterType = "String"
+		resultType = "com.flight.po.ReportCalculate">
+		select flight_no,
+		       (count(flight_no) * 92) as 'total_ticket',
+		       sum(ticket_num) as 'total_sold_ticket',
+		       sum(price) as 'total_tevenue',
+		       round((count(daily_flight_status) -
+		              count(case when (daily_flight_status = 'Delay') then 1 else null end)) /
+		              count(daily_flight_status), 2) as 'on_time_rate',
+		       count(flight_no) as 'flight_count'
+		from Report
+		where flight_date between concat('2019-0',#{value},'-01') and concat('2019-0',#{value},'-30')
+		group by flight_no;
+	</select>
+	
+</mapper>

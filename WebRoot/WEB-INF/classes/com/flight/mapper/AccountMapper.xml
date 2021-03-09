@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="com.flight.mapper.AccountMapper">
+
+	<select id="findAccountByAccount" parameterType = "com.flight.po.Account"
+		resultType = "com.flight.po.Account">
+		select * from Account 
+		<where>
+			<if test="account_id != null and account_id != 0 and account_id !=''">
+				or account_id = #{account_id}
+			</if>
+			<if test="account_tel != null and account_tel != ''">
+				or account_tel = #{account_tel}
+			</if>
+		</where>
+	</select>
+	
+	<insert id="addAccount" parameterType = "com.flight.po.Account" useGeneratedKeys = "true">
+		insert into Account (account_tel, account_name, account_pwd) values (#{account_tel},#{account_name},#{account_pwd});
+	</insert>
+	
+</mapper>

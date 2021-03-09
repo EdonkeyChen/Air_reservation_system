@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="com.flight.mapper.OrderMapper">
+
+	<insert id="addOrderDetail"  parameterType="com.flight.po.OrderDetail">
+        insert into Order_Detail (passenger_no, ticket_price_no, order_primary_no, ticket_price, order_detail_status,construction_fee, Fuel_surcharge)
+        values  
+	 	(#{passenger_no,jdbcType=INTEGER},#{ticket_price_no,jdbcType=INTEGER},#{order_primary_no,jdbcType=INTEGER},#{ticket_price,jdbcType=INTEGER},0, 50, 0);
+	</insert>
+	
+	<insert id="addOrderPrimary" parameterType="com.flight.po.OrderPrimary">
+		call orderPrimaryCreate(#{account_id},#{total_price},#{order_date},#{passenger_num},#{order_status},#{payer_name},#{payer_tel},#{payer_email});
+	</insert>
+	
+	<select id="findOrderNo" resultType = "Integer">
+		 select last_insert_id();
+	</select>
+	
+	<insert id="addPassenger" parameterType="com.flight.po.Passenger">
+		insert into Passenger (passenger_name, certificate_type, certificate_no, passenger_tel) 
+		values 
+		(#{passenger_name},#{passenger_name},#{passenger_name},#{passenger_name});
+	</insert>
+	
+	<update id="updateTicketNumber" parameterType="Integer" >
+		update Ticket_Price set ticket_num = ticket_num -1 where ticket_price_no = #{integer};
+	</update>
+	
+	<select id="findAllTicketPricNo" parameterType="Integer" 
+		resultType = "Integer">
+		select ticket_price_no from Ticket_Price,Seat_Type 
+			where Ticket_Price.seat_type_no = Seat_Type.seat_type_no and ticket_price_no in(
+				select ticket_price_no from Ticket_Price where daily_flight_no in (
+					select daily_flight_no from Ticket_Price where ticket_price_no = #{integer}
+				)
+			) and Seat_Type.real_type in(
+				select Seat_Type.real_type from Ticket_Price,Seat_Type 
+				where Ticket_Price.seat_type_no = Seat_Type.seat_type_no
+				and ticket_price_no = #{integer}
+			);
+	</select>
+	
+	<insert id="addReport" parameterType="com.flight.po.Report">
+		insert into Report (flight_no, flight_date, price, ticket_num, daily_flight_status)
+		values
+		(#{flight_no},#{flight_date},#{price},#{ticket_num},#{daily_flight_status});
+	</insert>
+	
+</mapper>

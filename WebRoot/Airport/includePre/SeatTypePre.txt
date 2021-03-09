@@ -1,0 +1,2 @@
+<option value = "1">economy class</option>
+<option value = "2">business class</option>

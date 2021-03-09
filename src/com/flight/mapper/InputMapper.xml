@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="com.flight.mapper.InputMapper">
+
+	<select id="findAllCityForInput" resultType = "com.flight.po.City">
+		select * from City
+	</select>
+	
+	<select id="findAllCityForFlightInput"></select>
+	
+	<select id="findAllAirportForInput" resultType = "com.flight.po.Airport">
+		select * from Airport
+	</select>
+	
+	<select id="findAllAircraftForInput" resultType = "com.flight.po.Aircraft">
+		select * from Aircraft;
+	</select>
+	
+	<select id="findAllAirportForFlightInput" parameterType = "com.flight.po.City"
+		resultType = "com.flight.po.Airport">
+		select * from Airport where city_no in (select city_no from City where city_name = #{city_name});
+	</select>
+	
+	<select id="findAllTerminalForFlightInput" parameterType = "com.flight.po.Airport"
+		resultType = "com.flight.po.Terminal">
+		select * from Terminal where airport_no in (select airport_no from Airport where airport_name = #{airport_name});
+	</select>
+	
+	<select id="findAllCityForDailyFlightInput"></select>
+	
+	<select id="findAllFlightForDailyFlightInput" parameterType = "com.flight.po.DailyFlightSelect"
+		resultType = "com.flight.po.Flight">
+		select * from Flight where 
+		terminal_no in (select Terminal_no from Terminal where Airport_no in (
+			select Airport_no from Airport where City_no in (
+				select City_no from City where City_name = #{departure_city})))
+		and
+		Ter_terminal_no in (
+			select Terminal_no from Terminal where Airport_no in (
+				select Airport_no from Airport where City_no in (
+					select City_no from City where City_name = #{arrival_city})))
+		order by scheduled_departure_time asc;
+	</select>
+	
+	<select id="findAllCityForTicketPriceInput"></select>
+	
+	<select id="findAllFlightForTicketPriceInput" parameterType = "com.flight.po.DailyFlight"
+		resultType = "com.flight.po.DailyFlight">
+		select * from Daily_Flight 
+		where 
+			flight_no in ( 
+				select flight_no from Flight where 
+				terminal_no in (select Terminal_no from Terminal where Airport_no in (
+					select Airport_no from Airport where City_no in (
+						select City_no from City where City_name = #{dCity}))) 
+				and 
+				Ter_terminal_no in (select Terminal_no from Terminal where Airport_no in (
+					select Airport_no from Airport where City_no in (
+						select City_no from City where City_name = #{aCity})))
+			) and 
+			flight_date = #{flight_date} order by estimated_departure_time asc;
+	</select>
+	
+	<select id="findAllSeatTypeForTicketPriceInput" resultType = "com.flight.po.SeatTypeSelect">
+		select * from Seat_Type;
+	</select>
+	
+	<insert id="addAirport" parameterType = "com.flight.po.City">
+		insert into Airport (city_no, airport_name) 
+			values((select city_no from City where city_name = #{city_name}),#{airport_name});
+	</insert>
+	
+	<insert id="addTerminal" parameterType = "com.flight.po.Airport">
+		insert into Terminal (airport_no, terminal_name) 
+			values ((select airport_no from Airport where airport_name = #{airport_name}), #{terminal_name});
+	</insert>
+	
+	<insert id="addAircraft" parameterType = "com.flight.po.Aircraft">
+		insert into Aircraft (aircraft_name) values (#{aircraft_name});
+	</insert>
+	
+	<insert id="addSeatType" parameterType = "com.flight.po.SeatType">
+		insert into Seat_Type (seat_type_name, luggage_limit, refund_change_rules,real_type) 
+			values (#{seat_type_name},'Free baggage allowance of 20kg',#{refund_change_rules},#{real_type});
+	</insert>
+	
+	<insert id="addFlight" parameterType = "com.flight.po.Flight">
+		insert into Flight (flight_no, terminal_no, Ter_terminal_no, aircraft_no, 
+			scheduled_departure_time, scheduled_arrival_time, catering, flight_time) 
+		values (#{flight_no},#{terminal_no}, #{Ter_terminal_no}, #{aircraft_no}, 
+			#{scheduled_departure_time}, #{scheduled_arrival_time}, #{catering}, #{flight_time});
+	</insert>
+	
+	<insert id="addDailyFlight" parameterType = "com.flight.po.DailyFlight">
+		insert into Daily_Flight (flight_no, flight_date, actual_departure_time,actual_arrival_time, 
+			estimated_departure_time, estimated_arrival_time, daily_flight_status) 
+		values (#{flight_no}, #{flight_date}, #{actual_departure_time}, #{actual_arrival_time}, 
+			#{estimated_departure_time}, #{estimated_arrival_time}, 'Schedule');
+	</insert>
+	
+	<insert id="addTicketPrice" parameterType = "com.flight.po.TicketPriceSelect">
+		insert into Ticket_Price (daily_flight_no, seat_type_no, price, ticket_num) 
+		values 
+		((select daily_flight_no from Daily_Flight where flight_no = #{flight_no} and flight_date =#{flight_date}),
+			#{seat_type_no}, #{price}, #{ticket_num});
+	</insert>
+	
+</mapper>

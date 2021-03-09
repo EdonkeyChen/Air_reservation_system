@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace ="com.flight.mapper.AirportMapper">
+
+	<select id="findAllDailyFlightForAirport" parameterType = "com.flight.po.FlightDynamicStatus"
+		resultType = "com.flight.po.DailyFlight">
+		select Daily_Flight.*,C.airport_name as dAirport_name,A.terminal_name as dTerminal_name,
+		D.airport_name as aAirport_name,B.terminal_name as aTerminal_name
+		from Flight,Terminal as A,Terminal as B,Airport as C,Airport as D,Daily_Flight
+		where  Flight.terminal_no = A.terminal_no and A.airport_no = C.airport_no
+		and Flight.Ter_terminal_no = B.terminal_no and B.airport_no = D.airport_no
+		and Daily_Flight.flight_no = Flight.flight_no
+		and flight_date = #{flight_date}
+		and estimated_departure_time between #{start_time} and #{end_time}
+		order by scheduled_departure_time asc;
+	</select>
+	
+	<update id="modifyDailyFlight" parameterType = "com.flight.po.DailyFlight">
+		update Daily_FLight set 
+			actual_departure_time = #{actual_departure_time},
+			actual_arrival_time = #{actual_arrival_time},
+			daily_flight_status = #{daily_flight_status} 
+			where daily_flight_no = #{daily_flight_no};
+	</update>
+	
+	<update id="modifyReport" parameterType = "com.flight.po.DailyFlight">
+		update Report 
+			set daily_flight_status = #{daily_flight_status}
+			where flight_no = #{flight_no}
+				and flight_date = #{flight_date};
+	</update>
+
+</mapper>

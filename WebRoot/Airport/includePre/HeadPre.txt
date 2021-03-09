@@ -1,0 +1,10 @@
+<h1></h1>
+<div class="container">
+	<div class="jumbotron">
+		<div class="row">
+			<div class="col-md-6" >
+				<a href="/Web-Curriculum-design/Main.jsp"><img src="icon-image/logo.png" width="400" ></a>
+			</div>
+		</div>
+	</div>
+</div>

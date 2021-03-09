@@ -1,0 +1,8 @@
+	<option></option>
+<%
+	for( Airport airport : aList ) {
+%>
+	<option><%=airport.getAirport_name()%></option>
+<%
+	}
+%>

@@ -1,0 +1,8 @@
+	<option></option>
+<%
+	for( City city : all ) {
+%>
+	<option><%=city.getCity_name()%></option>
+<%
+	}
+%>

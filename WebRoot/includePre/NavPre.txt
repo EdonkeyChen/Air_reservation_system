@@ -1,0 +1,41 @@
+<nav class="navbar bg-gray navbar-fixed-top" style="font-family: Kohinoor Devanagari Bold;">
+		<div class="container">
+			<div class="navbar-header">
+				<div class="col-md-4 magintop-2" >
+					<a href="Main.jsp"><img src="icon-image/logo.png" width="300" ></a>
+				</div>
+			</div>
+			<div id="navbar" class="navbar-collapse">
+				<div class="btn-group magintop-07 maginleft-50">
+					<button type="button" class="btn bg-gray dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+<%
+					if(account_name != null && account_id != null){
+%>
+						<%=account_name %> (<%=account_id %>)
+<%
+					}else{
+%>
+						LOGIN
+<%
+					}
+%>
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu js-activated">
+<%
+					if(account_name != null && account_id != null){
+%>
+						<li><a href="Logout.jsp">Logout</a></li>
+<%
+					}else{
+%>
+						<li><a href="Login.jsp">Member Login</a></li>
+						<li><a href="Register.jsp">Register</a></li>
+<%
+					}
+%>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</nav>
